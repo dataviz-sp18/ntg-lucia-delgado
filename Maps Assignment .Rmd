@@ -1,0 +1,212 @@
+---
+title: "Which states are more healthy?"
+#author: "Lucia Delgado"
+output:
+  html_document: default
+  md_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Prevalent health habits among Mexican Population per State 
+
+```{r, include=FALSE}
+library(haven)
+library(data.table)
+library(ggplot2)
+library(tidyverse)
+library(knitr)
+library(dplyr)
+library(grid)
+```
+
+```{r, include=FALSE}
+#Open Data
+setwd("~/Documents/1. Harris/6 Quarter/Data Viz/Maps/")
+DT <- read_csv("perc_cvs.csv")
+DT = data.table(DT)
+```
+
+```{r, include=FALSE}
+unique(DT$desc_ent)
+```
+
+
+```{r, include=FALSE}
+# Clean state variable
+
+DT$desc_ent <- recode(DT$entidad, 
+                      "11"= "11 GUANAJUATO", 
+                      "10"="10 DURANGO", 
+                      "12"="12 GUERRERO",                    
+                      "19"="19 NUEVO LEON",            
+                      "15"="15 MEXICO",                
+                      "32"="32 ZACATECAS",                   
+                      "23"="23 QUINTANA ROO",                 
+                      "22"="22 QUERATARO"    ,        
+                      "09"= "09 MEXICO CITY",            
+                      "05"="05 COAHUILA",        
+                      "07"= "07 CHIAPAS",                      
+                      "30"="30 VERACRUZ",
+                      "24"= "24 SAN LUIS POTOSI",       
+                      "27"="27 TABASCO",                     
+                      "28"="28 TAMAULIPAS",                  
+                      "29"="29 TLAXCALA",                    
+                      "13"="13 HIDALGO",                      
+                      "31"="31 YUCATAN",             
+                      "26"="26 SONORA",                      
+                      "14"="14 JALISCO",                     
+                      "16"="16 MICHOACAN" , 
+                      "21"="21 PUEBLA" ,                      
+                      "02"="02 BAJA CALIFORNIA" ,            
+                      "18"="18 NAYARIT" ,                    
+                      "08"="08 CHIHUAHUA" ,                   
+                      "01"="01 AGUASCALIENTES"  ,             
+                      "25"="25 SINALOA",                    
+                      "03"="03 BAJA CALIFORNIA SUR",          
+                      "04"="04 CAMPECHE" ,                    
+                      "17"="17 MORELOS"  )
+```
+
+```{r, include=FALSE}
+# Coordinates
+
+st = data.table(state = unique(DT$desc_ent))
+st[,lat:=0]
+st[,lon:=0]
+st[state == "11 GUANAJUATO", c("lat","lon") := list(20.9170, -101.1617)]
+
+st[state =="10 DURANGO", c("lat","lon") := list(24.5593 ,-104.6588 )]
+
+st[state =="12 GUERRERO", c("lat","lon") := list(17.4392 , - 99.5451 )]                   
+st[state =="19 NUEVO LEON", c("lat","lon") := list(25.5922 , - 99.9962 )]           
+st[state =="15 MEXICO", c("lat","lon") := list( 19.2826, -99.6557 )]               
+st[state =="32 ZACATECAS",  c("lat","lon") := list( 22.7709, -102.5832 )]                 
+st[state =="23 QUINTANA ROO", c("lat","lon") := list(18.5002 ,- 88.2961 )]                
+st[state =="22 QUERATARO"    , c("lat","lon") := list(20.5888 , -100.3899 )]       
+st[state =="09 MEXICO CITY",c("lat","lon") := list(19.4326 , - 99.1332)]            
+st[state =="05 COAHUILA",   c("lat","lon") := list(27.0587, -101.7068 )]     
+st[state == "07 CHIAPAS",  c("lat","lon") := list(16.7516 ,-93.1030 )]                    
+st[state =="30 VERACRUZ", c("lat","lon") := list(19.1738 ,-96.1342 )]
+st[state == "24 SAN LUIS POTOSI",   c("lat","lon") := list(22.1566 , -100.9855 )]  
+st[state =="27 TABASCO",  c("lat","lon") := list( 17.8409,92.6189 )]                   
+st[state =="28 TAMAULIPAS",  c("lat","lon") := list(24.2669 , -98.8363 )]                
+st[state =="29 TLAXCALA",   c("lat","lon") := list( 19.3182, -98.2375 )]                 
+st[state =="13 HIDALGO", c("lat","lon") := list(20.0911 , -98.7624 )]                     
+st[state =="31 YUCATAN", c("lat","lon") := list(20.7099 , -89.0943 )]            
+st[state =="26 SONORA",  c("lat","lon") := list(29.2972 , -110.3309 )]                    
+st[state =="14 JALISCO", c("lat","lon") := list(20.6595 ,-103.3494 )]                    
+st[state =="16 MICHOACAN" , c("lat","lon") := list(19.5665 ,101.7068 )]
+st[state =="21 PUEBLA" ,   c("lat","lon") := list(19.0414 , -98.2063 )]                   
+st[state =="02 BAJA CALIFORNIA" , c("lat","lon") := list(30.8406 , -115.2838 )]           
+st[state =="18 NAYARIT" , c("lat","lon") := list(21.7514 , -104.8455 )]                   
+st[state =="08 CHIHUAHUA" , c("lat","lon") := list(28.6330 ,-106.0691 )]                  
+st[state =="01 AGUASCALIENTES"  ,  c("lat","lon") := list(21.8853 , -102.2916)]           
+st[state =="25 SINALOA", c("lat","lon") := list(25.1721 ,-107.4795 )]                    
+st[state =="03 BAJA CALIFORNIA SUR", c("lat","lon") := list(26.0444 , -111.6661 )]         
+st[state =="04 CAMPECHE" ,  c("lat","lon") := list( 18.9312, -90.2618 )]                  
+st[state =="17 MORELOS" ,c("lat","lon") := list(18.6813 , -99.1013)]
+
+st[,desc_ent := state]
+st[,state := NULL]
+```
+
+
+```{r, include=FALSE}
+# Variables of interests
+pop = DT[, .(pop = sum(ponde_f)), by = .(desc_ent)]
+
+
+# Consumption of SSB several times per week or more
+ssb_cons = DT[ perc131 == "varias veces a la semana" | perc131 == "menos de una vez al mes o nunca", .(ssb_cons = sum(ponde_f)), by = .(desc_ent)]
+
+  # Sweetened beverages are healthy per138
+  ssb_healthy = DT[ perc138 == "de acuerdo" | perc131 ==  "totalmente de acuerdo", .(ssb_healthy = sum(ponde_f)), by = .(desc_ent)]
+  
+  # Afordable access to pure water perc139
+  ssb_access = DT[ perc138 == "de acuerdo" | perc131 ==  "totalmente de acuerdo", .(ssb_access = sum(ponde_f)), by = .(desc_ent)]
+
+
+# Physical activity 3 times per week or more perc104
+phy_act = DT[ perc104 == "si", .(phy_act = sum(ponde_f)), by = .(desc_ent)]
+
+  #Not enough safe spaces to excercise perc118
+  phy_act_space = DT[ perc118 == "si", .(phy_act_space = sum(ponde_f)), by = .(desc_ent)]
+
+
+
+  # Fruits and vegetables consumption perc108
+fru_veg = DT[ perc108 == "si", .(fru_veg = sum(ponde_f)), by = .(desc_ent)]
+
+# Fruits and vegetables consumption (at least 5 per day) perc110
+fru_veg_5 = DT[ perc110 == "si", .(fru_veg_5 = sum(ponde_f)), by = .(desc_ent)]
+
+  # Lack of knowledge about how to cook healthy food perc125
+  fru_veg_know = DT[ perc125 == "si", .(fru_veg_know = sum(ponde_f)), by = .(desc_ent)]
+
+  # Lack of TIME about how to cook healthy food perc128
+  fru_veg_time = DT[ perc128 == "si", .(fru_veg_time = sum(ponde_f)), by = .(desc_ent)]
+  
+  # Lack of Money about how to cook healthy food perc129
+  fru_veg_money = DT[ perc129 == "si", .(fru_veg_money = sum(ponde_f)), by = .(desc_ent)]
+
+
+```
+
+```{r, include=FALSE}
+#Data for map
+ssb = merge(pop, ssb_cons, by = c("desc_ent"))
+ssb = merge(ssb, phy_act, by = c("desc_ent") )
+ssb = merge(ssb, fru_veg_5, by = c("desc_ent") )
+
+ssb = merge(ssb,st, by = c("desc_ent"))
+
+ssb[,ssb := round(100*ssb_cons/pop)]
+ssb[, fruit := round(100*fru_veg_5/pop)]
+ssb[, phy := round(100*phy_act/pop)]
+
+ssb[,content := paste(sep = "<br/>",
+  paste("<b>", desc_ent, "</b>"),
+  paste("<b>","Population Habits", "</b>"),
+  " ",
+  "Consume SSBs Regularly",
+  paste(ssb, " %"), 
+  "Consume Fruit Regulary",
+  paste(fruit," %"),
+  "Excercise Regularly",
+  paste(fruit," %")
+  
+  
+  
+  
+  
+  )]
+
+```
+
+```{r, echo=FALSE}
+#MAPS
+library(leaflet)
+
+content <- paste(sep = "<br/>",
+  "<b>Mexico City</b>",
+  "SSB",
+  "Perception",
+  "Reason"
+)
+
+m <- leaflet() %>%
+  setView( -99, 19, 4) %>%
+  addTiles()  # Add default OpenStreetMap map tiles
+
+#Add markers to map
+
+for ( i in ssb){
+  m <- addMarkers(m,lng=ssb$lon, lat=ssb$lat, popup=ssb$content)
+}
+m
+```
+
+Source: ENSANUT 2016.

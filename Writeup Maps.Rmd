@@ -1,0 +1,24 @@
+---
+title: "Assignment 4 Writeup"
+author: "Lucia Delgado"
+output:
+  github_document: default
+  html_document: default
+  md_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This map provides information on the prevalent habits of the Mexican population per state. Popups for each state display information on prevalent health habits. I decided to use an interactive map to display this information to allow the user to search for particular geographical tends in health habits, which is not possible when using a table or a bar plot. Interactivity, in contrast to a static form, allows to include more information in the visualization without making it hard to read. In addition, interactivity can help the user engage more with the information provided in the visualization.
+
+The map was constructed using the Leaflet library. Information about population habits comes from a Mexican National Health Survey (ENSANUT 2016). This survey is representative at the state level, so no smaller geographic segmentation can be accurately obtained from this data. The location of each popup is determined by the capital of each state.
+
+Each popup provides information on three habits categories for each state: regular consumption of sweetened beverages, regular consumption of fruits and regular physical activity (exercise). It is interesting that there are substantial differences between neighboring states. For instance, Queretaro is the state in which a higher percentage of the population exercise and eat fruits regularly. The percentage is substantially different from the rest of the states, in particular from its neighboring states.
+
+It would have been desirable to show information at the municipal level. However, the survey design of ENSANUT does not allow to represent the data at a smaller level accurately.  An additional challenge when constructing the map was to generate the location for each state since there is no accessible data matching states to the location of its capital.
+
+ 
+
